@@ -2,7 +2,6 @@
 #include "Header.h"
 int vidas = 5;
 
-
 void primer_nivel(personaje* principal, int& nivel) {
     vidas = 5;
     int lineas = 20;
@@ -10,23 +9,51 @@ void primer_nivel(personaje* principal, int& nivel) {
     int siguiente = 0;
     int compañeros = 0;
     vector<proyectil> recamara;
+    vector<int> posiciones_rastro = { principal->x, principal->x };
+    rastro_agua rastro1;
+    rastro_agua rastro2;
+    rastro_agua rastro3;
+    rastro_agua rastro4;
+    rastro_agua rastro5;
+    rastro_agua rastro6;
+    rastro_agua rastro7;
+	rastro_agua rastro8;
+    rastro_agua rastro9;
+    rastro_agua rastro10;
+	rastro_agua rastro11;
+    rastro_agua rastro12;
+	rastro_agua rastro13;
+    vector<rastro_agua> rastro = { rastro1, rastro2, rastro3, rastro4, rastro5, rastro6, rastro8, rastro9, rastro10, rastro11, rastro12, rastro13 };
+    for (int i = 0; i < rastro.size(); i++) {
+        rastro[i].y = principal->y + 4 + i;
+        rastro[i].x = principal->x;
+    }
     //columnas
-    int uno = 1;
-    int dos = 6;
-    int tres = 11;
-    int cuatro = 16;
-    int cinco = 21;
-    int seis = 26;
-    int siete = 31;
-    int ocho = 36;
-    int nueve = 41;
-    int diez = 46;
-    int once = 51;
-    int doce = 56;
-    int trece = 61;
-    int catorce = 66;
-    int quince = 71;
-    int dieciseis = 76;
+    int uno = 1+centro;
+    int dos = 6+centro;
+    int tres = 11 + centro;
+    int cuatro = 16 + centro;
+    int cinco = 21 + centro;
+    int seis = 26 + centro;
+    int siete = 31 + centro;
+    int ocho = 36 + centro;
+    int nueve = 41 + centro;
+    int diez = 46 + centro;
+    int once = 51 + centro;
+    int doce = 56 + centro;
+    int trece = 61 + centro;
+    int catorce = 66 + centro;
+    int quince = 71 + centro;
+    int dieciseis = 76 + centro;
+    int diecisiete = 81 + centro;
+    int dieciocho = 86 + centro;
+	int diecinueve = 91 + centro;
+    int veinte = 96 + centro;
+    int veintiuno = 101 + centro;
+    int veintidos = 106 + centro;
+	int veintitres = 111 + centro;
+    int veinticuatro = 116 + centro;
+	int veinticinco = 121 + centro;
     //primera
     vector<bloque*> bloques1(8);
     for (int i = 0; i < bloques1.size(); i++) {
@@ -78,6 +105,7 @@ void primer_nivel(personaje* principal, int& nivel) {
     bloques3[9]->x = dieciseis;
 
 
+
     //cuarta
     vector<bloque*> bloques4(10);
     for (int i = 0; i < bloques4.size(); i++) {
@@ -126,6 +154,26 @@ void primer_nivel(personaje* principal, int& nivel) {
 
     vector<agente*> enemigos5(2);
 
+    //final del nivel
+    vector<casa*> casas(2);
+
+    for (int i = 0; i < casas.size(); i++) {
+		casas[i] = new casa();
+		casas[i]->y = 1;
+	}
+    casas[0]->x = uno;
+    casas[1]->x = nueve;
+
+    vector<casa*> casas2(2);
+    for (int i = 0; i < casas2.size(); i++) {
+        casas2[i] = new casa();
+        casas2[i]->y = 1;
+    }
+
+    casas2[0]->x =cinco;
+    casas2[1]->x = doce;
+
+
     for (int i = 0; i < enemigos5.size(); i++) {
         enemigos5[i] = new agente();
         enemigos5[i]->y = 1;
@@ -149,10 +197,16 @@ void primer_nivel(personaje* principal, int& nivel) {
             movimiento_proyectil(recamara[i], recamara, 1);
         }
         
+        mover_rastro(principal, rastro, posiciones_rastro);
+
         if (siguiente == 30) {
             linea_actual++;
             siguiente = 0;
         }
+
+        dibujar_indicaciones();
+
+
         if (linea_actual > 0) {
 
             for (int i = 0; i < bloques1.size(); i++) {
@@ -194,7 +248,22 @@ void primer_nivel(personaje* principal, int& nivel) {
                 if (revisar_colision_agente(principal, enemigos5[i])) vidas -= 2;
             }
         }
-        if (linea_actual > 6) {
+    if (linea_actual > 5) {
+			for (int i = 0; i < casas.size(); i++) {
+				movimiento_casa(casas[i], 1);
+                
+				if (siguiente ==10) {
+					system("cls");
+					return;
+				}
+			}
+            if (siguiente > 2) {
+                for (int i = 2; i < casas2.size(); i++) {
+                    movimiento_casa(casas2[i], 1);
+                }
+            }
+		}
+        if (linea_actual > 7) {
             nivel++;
             system("cls");
             return;
@@ -234,7 +303,7 @@ void game_loop() {
     personaje* principal;
     principal = new personaje();
 
-    principal->x = 35;
+    principal->x = 35+centro;
     principal->y = 32;
 
     int lineas = 20;
