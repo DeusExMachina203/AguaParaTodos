@@ -2,8 +2,10 @@
 #include "conio.h"
 #include "iostream"
 #include <vector>
-#define FILAS 40
-#define COLUMNAS 80
+#include <wchar.h>
+#include <windows.h>
+#define FILAS 50
+#define COLUMNAS 160
 #define Arriba 72
 #define Abajo  80
 #define Derecha 77
@@ -13,6 +15,8 @@
 
 using namespace System;
 using namespace std;
+
+int centro = 40;
 
 void cursor(int x, int y)
 {
@@ -40,13 +44,32 @@ void color(int c)
     }
 }
 
+struct casa {
+	int x, y;
+	vector<string> figura = { 
+        "             )",
+        "            (", 
+        "    ________[]_",
+        "   /^=^-^-^=^-^\\",
+        "  /^-^-^-^-^-^-^\\", 
+        " /__^_^_^_^^_^_^_\\", 
+        "  |  .==.       |", 
+        "^^|  |LI|  [}{] |^^^^^", 
+        "&&|__|__|_______|&&", };
+};
+
+struct rastro_agua {
+	int x, y;
+    string figura = "~~~~~";
+};
+
 struct personaje
 {
     int x, y;
     int compañeros = 0;
-    string cabeza = "  *";
-    string cuerpo = " * *";
-    string pies = "*   *";
+    string cabeza = "  ^";
+    string cuerpo = " /\\\\";
+    string pies = "////\\";
 
 };
 
@@ -58,6 +81,7 @@ struct bloque {
     bool recoriendo = true;
     vector<string> figura = { "###", "###", "###" };
     vector<string> figura_debil = { "$$$", "$$$", "$$$" };
+    string transision = "   ";
 };
 
 struct proyectil {
@@ -187,7 +211,7 @@ void dibuja_bloque(bloque* objeto) {
 void borra_bloque(bloque* objeto) {
     color(14);
     for (int i = 0; i < objeto->figura.size(); i++) {
-        cursor(objeto->x, objeto->y + i); cout << "   ";
+        cursor(objeto->x, objeto->y + i); cout << objeto->transision;
     }
 }
 
@@ -201,6 +225,8 @@ void movimiento_bloque(bloque*& objeto, int cantidad, vector<bloque*>& bloques) 
     if (objeto->y > 35) {
         borra_bloque(objeto);
         objeto->recoriendo = false;
+        objeto->figura = { "","","" };
+        objeto->transision = "";
     }
 }
 
@@ -247,8 +273,8 @@ void movimiento_personaje(personaje* principal, char tecla) {
     dibuja_personaje(principal);
     borra_personaje(principal);
 
-    if (tecla == 77 && principal->x < 75) principal->x += 5; //derecha
-    if (tecla == 75 && principal->x > 0) principal->x -= 5; //izq
+    if (tecla == 77 && principal->x < centro+75) principal->x += 5; //derecha
+    if (tecla == 75 && principal->x > centro+0) principal->x -= 5; //izq
 
     dibuja_personaje(principal);
 
@@ -291,9 +317,54 @@ void colision_proyectil_bloque(vector<proyectil> recamara, vector<bloque*> linea
             if (linea[i]->debil && ((recamara[j].x >= linea[i]->x) && (recamara[j].x <= linea[i]->x + 2)) && (recamara[j].y >= linea[i]->y && recamara[j].y <= linea[i]->y + 2)) {
                 linea[i]->debil = false;
 				linea[i]->colisionado = true;
-                linea[i]->figura = {"   ","   ","   "};
+                linea[i]->figura = {"","",""};
+                borra_bloque(linea[i]);
+                linea[i]->transision = "";
             }
         }
 
     }
+}
+
+//rastro de agua
+void mover_rastro(personaje* principal, vector<rastro_agua> &rastro, vector<int> posiciones) {
+    color(9);
+    
+    
+
+    for (int i = 0; i < rastro.size(); i++) {
+		cursor(rastro[i].x, rastro[i].y); cout << "     ";
+	}
+
+    for(int i = rastro.size()-1; i > 0; i--){
+		rastro[i].x = rastro[i-1].x;
+	}
+    rastro[0].x = principal->x;
+    for (int i = 0; i < rastro.size(); i++) {
+        cursor(rastro[i].x, rastro[i].y); cout << rastro[i].figura;
+    }
+}
+//casas
+void dibujar_casa(casa* casa) {
+    
+    color(6);
+    for (int j = 0; j < casa->figura.size(); j++){
+        cursor(casa->x, casa->y + j); cout << casa->figura[j];
+    }
+}
+
+void borrar_casa(casa* casa) {
+    for (int j = 0; j < casa->figura.size(); j++) {
+        cursor(casa->x, casa->y + j); cout << "                       ";
+    }
+}
+
+void movimiento_casa(casa* casa, int cantidad) {
+	borrar_casa(casa);
+	casa->y += cantidad;
+	dibujar_casa(casa);
+}
+//indicaciones
+void dibujar_indicaciones() {
+    
 }
